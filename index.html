@@ -75,8 +75,6 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 .how-type-badge{font-family:var(--font-display);font-size:.55rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .7rem;border-radius:50px;white-space:nowrap;flex-shrink:0;background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2)}
 
 /* Game Screen */
-#game-screen{display:none}
-#game-screen.active{display:flex;flex-direction:column}
 .game-header{display:flex;align-items:center;justify-content:space-between;padding:.5rem .8rem;border-bottom:1px solid var(--border);background:var(--bg-card);backdrop-filter:blur(8px);flex-shrink:0;z-index:5}
 .header-left,.header-right{display:flex;align-items:center;gap:.5rem}
 .level-info{display:flex;align-items:center;gap:.5rem}
@@ -193,16 +191,16 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 <p class="title-story">"Cadet — the Glaxonian Math Corps needs you. Only those who master the V-function can pilot a saucer through the coordinate nebula."<br>— Commander Vertex, Glaxonia Prime 3</p>
 <div class="title-equation">y = a|x − h| + k</div>
 <div class="title-buttons">
-<button id="btn-new-game" class="btn btn-primary" onclick="Game.startNew()">🚀 Begin Mission</button>
-<button id="btn-continue" class="btn btn-secondary" onclick="Game.continueGame()" style="display:none">▶ Continue</button>
+<button id="btn-new-game" class="btn btn-primary">🚀 Begin Mission</button>
+<button id="btn-continue" class="btn btn-secondary" style="display:none">▶ Continue</button>
 </div>
-<div class="title-how"><button class="btn-link" onclick="Game.showHow()">⬇ How to Play</button></div>
+<div class="title-how"><button class="btn-link" id="btn-how">⬇ How to Play</button></div>
 </div>
 </div>
 
 <div id="how-screen" class="screen">
 <div class="how-content">
-<button class="btn-back" onclick="Game.showTitle()">← Back to Base</button>
+<button class="btn-back" id="btn-back-how">← Back to Base</button>
 <h2>Mission Briefing</h2>
 <div class="how-grid">
 <div class="how-card"><div class="how-icon">🎯</div><h3>Your Mission</h3><p>Each level gives you coordinates. Land your saucer's vertex on the red target, then adjust slope so the V-lasers hit the blue target.</p></div>
@@ -219,7 +217,7 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 <div id="game-screen" class="screen">
 <header class="game-header">
 <div class="header-left">
-<button class="btn-icon" onclick="Game.showTitle()" title="Menu"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+<button class="btn-icon" id="btn-menu" title="Menu"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
 <div class="level-info"><span class="level-badge" id="level-type-badge">Mission</span><span class="level-number" id="level-number">Level 1</span></div>
 <span class="rank-badge" id="rank-badge">Cadet</span>
 </div>
@@ -236,12 +234,12 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 <div class="input-modal" id="input-modal" style="display:none"><div class="input-modal-inner">
 <label class="input-label" id="input-label">Set value for h:</label>
 <input type="number" id="input-field" class="input-number" step="1" autocomplete="off">
-<div class="input-actions"><button class="btn btn-sm btn-cancel" onclick="Game.cancelInput()">Cancel</button><button class="btn btn-sm btn-confirm" onclick="Game.confirmInput()">Set</button></div>
+<div class="input-actions"><button class="btn btn-sm btn-cancel" id="btn-input-cancel">Cancel</button><button class="btn btn-sm btn-confirm" id="btn-input-confirm">Set</button></div>
 </div></div>
 <div class="input-modal" id="frac-modal" style="display:none"><div class="input-modal-inner">
 <label class="input-label">Set slope (a) — Rise / Run:</label>
 <div class="fraction-input-wrap">
-<span class="frac-sign" id="frac-sign" onclick="Game.toggleFracSign()" title="Toggle sign">+</span>
+<span class="frac-sign" id="frac-sign" title="Toggle sign">+</span>
 <div class="fraction-box">
 <input type="number" id="frac-num" class="frac-num" placeholder="Rise" step="1" min="0" autocomplete="off">
 <div class="frac-line"></div>
@@ -249,7 +247,7 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 </div>
 </div>
 <div class="frac-preview" id="frac-preview"></div>
-<div class="input-actions"><button class="btn btn-sm btn-cancel" onclick="Game.cancelInput()">Cancel</button><button class="btn btn-sm btn-confirm" onclick="Game.confirmFraction()">Set</button></div>
+<div class="input-actions"><button class="btn btn-sm btn-cancel" id="btn-frac-cancel">Cancel</button><button class="btn btn-sm btn-confirm" id="btn-frac-confirm">Set</button></div>
 </div></div>
 <div class="feedback-toast" id="feedback-toast" style="display:none"><span id="feedback-icon"></span><span id="feedback-msg"></span></div>
 <div class="equation-bar">
@@ -258,7 +256,7 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 <span class="eq-text">&nbsp;|x −&nbsp;</span><span class="eq-variable" id="eq-h" tabindex="0" role="button" aria-label="Edit h value">h</span>
 <span class="eq-text">| +&nbsp;</span><span class="eq-variable" id="eq-k" tabindex="0" role="button" aria-label="Edit k value">k</span>
 </div>
-<button class="btn btn-try" id="btn-try" onclick="Game.trySolution()">Try Solution 🛸</button>
+<button class="btn btn-try" id="btn-try">Try Solution 🛸</button>
 </div>
 </div>
 
@@ -272,7 +270,7 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 <div><span class="cs-label">Attempts</span><span class="cs-value" id="complete-attempts">1/2</span></div>
 <div><span class="cs-label">Combo</span><span class="cs-value" id="complete-combo" style="color:var(--yellow)">x1</span></div>
 </div>
-<button class="btn btn-primary" onclick="Game.nextLevel()">Next Mission →</button>
+<button class="btn btn-primary" id="btn-next-level">Next Mission →</button>
 </div></div>
 
 <div id="level-failed" class="overlay" style="display:none"><div class="overlay-card overlay-fail">
@@ -280,12 +278,12 @@ html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:va
 <p id="fail-msg" class="fail-msg">Glaxonon police put you in Xinothropic Galactic Jail for 2 parsecs.</p>
 <p id="fail-answer" class="fail-answer"></p>
 <p id="fail-story" class="story-text"></p>
-<button class="btn btn-primary" onclick="Game.nextLevel()">Next Mission →</button>
-<button class="btn btn-secondary" onclick="Game.retryLevel()">Retry Mission</button>
+<button class="btn btn-primary" id="btn-fail-next">Next Mission →</button>
+<button class="btn btn-secondary" id="btn-retry">Retry Mission</button>
 </div></div>
 
 <script>
-/* Starfield */
+/* ===== Starfield ===== */
 (function(){
 const sc=document.getElementById('starfield-canvas'),sx=sc.getContext('2d');
 let stars=[];const N=180;
@@ -298,7 +296,7 @@ requestAnimationFrame(dr)}
 addEventListener('resize',rs);rs();dr()
 })();
 
-/* Main Game */
+/* ===== Main Game ===== */
 const Game=(()=>{
 const STORY_S=["Your V-lasers carved a perfect path. The nebula map updates.","Sector cleared! Glaxonia Prime 3 tracking your progress.","Commander Vertex nods approvingly. Coordinates locked.","The coordinate nebula parts before you. Onward, pilot!","Stellar navigation on point. The Math Corps is impressed.","Another sector mapped. The Glaxonian frontier shrinks.","Your saucer's V-beams illuminate the void perfectly.","Control tower confirms: trajectory nominal. Well done, Cadet."];
 const STORY_F=["Your lasers veered off course. The nebula swallowed them.","The Glaxonon patrol noted that deviation. Be more careful.","Commander Vertex sighs but signals to try the next sector.","The coordinate fog thickens. Don't lose your bearings."];
@@ -307,7 +305,9 @@ const RANKS=[{min:0,name:'Cadet',c:'#7a8ba8'},{min:300,name:'Navigator',c:'#60a5
 let st={level:1,score:0,attempts:2,maxAttempts:2,a:null,h:null,k:null,aNum:null,aDen:null,aNeg:false,target:{x:0,y:0},slopeTarget:{x:0,y:0},solved:false,editingVar:null,levelHistory:[],combo:0};
 let an={active:false,phase:'none',startTime:0,saucerX:0,saucerY:0,startPx:[0,0],endPx:[0,0],laserProgress:0,glowAlpha:0,hitP:[],hitR:[]};
 const FLY=900,GLOW=500,LASER=600,HIT=900,HOLD=700;
-let canvas,ctx,cW,cH,bounds={xMin:-10,xMax:10,yMin:-10,yMax:10},uPx=1;
+let canvas=null,ctx=null,cW=0,cH=0,bounds={xMin:-10,xMax:10,yMin:-10,yMax:10},uPx=1;
+let pulseRAF=null; // track the pulsing animation frame
+let initialized=false;
 const C={bg:'#0b0e17',grid:'rgba(60,80,130,.15)',gridA:'rgba(60,80,130,.25)',axis:'rgba(100,140,200,.4)',axLab:'rgba(130,160,210,.6)',tgt:'#ff5c5c',tgtG:'rgba(255,92,92,.2)',sT:'#5c9eff',sTG:'rgba(92,158,255,.2)',sG:'rgba(96,165,250,.5)',lC:'#39ff7f',lG:'rgba(57,255,127,.25)',lO:'rgba(57,255,127,.06)'};
 
 function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
@@ -342,21 +342,59 @@ return 'Land vertex on ('+tg.x+', '+tg.y+') · hit point '+o+' at ('+sl.x+', '+s
 function getRank(s){let r=RANKS[0];for(const x of RANKS)if(s>=x.min)r=x;return r}
 
 function init(){
-canvas=document.getElementById('graph-canvas');ctx=canvas.getContext('2d');
-addEventListener('resize',()=>{resizeCanvas();if(!an.active)draw()});
+if(initialized)return;
+initialized=true;
+canvas=document.getElementById('graph-canvas');
+ctx=canvas.getContext('2d');
+addEventListener('resize',()=>{
+if(document.getElementById('game-screen').classList.contains('active')){
+resizeCanvas();if(!an.active)draw()
+}
+});
+
+// All event listeners via JS (no inline onclick)
+document.getElementById('btn-new-game').addEventListener('click',()=>startNew());
+document.getElementById('btn-continue').addEventListener('click',()=>continueGame());
+document.getElementById('btn-how').addEventListener('click',()=>showHow());
+document.getElementById('btn-back-how').addEventListener('click',()=>showTitle());
+document.getElementById('btn-menu').addEventListener('click',()=>showTitle());
+document.getElementById('btn-try').addEventListener('click',()=>trySolution());
+document.getElementById('btn-input-cancel').addEventListener('click',()=>cancelInput());
+document.getElementById('btn-input-confirm').addEventListener('click',()=>confirmInput());
+document.getElementById('btn-frac-cancel').addEventListener('click',()=>cancelInput());
+document.getElementById('btn-frac-confirm').addEventListener('click',()=>confirmFraction());
+document.getElementById('frac-sign').addEventListener('click',()=>toggleFracSign());
+document.getElementById('btn-next-level').addEventListener('click',()=>nextLevel());
+document.getElementById('btn-fail-next').addEventListener('click',()=>nextLevel());
+document.getElementById('btn-retry').addEventListener('click',()=>retryLevel());
+
 document.getElementById('eq-a').addEventListener('click',()=>openInput('a'));
 document.getElementById('eq-h').addEventListener('click',()=>openInput('h'));
 document.getElementById('eq-k').addEventListener('click',()=>openInput('k'));
 document.getElementById('input-field').addEventListener('keydown',e=>{if(e.key==='Enter')confirmInput();if(e.key==='Escape')cancelInput()});
 ['frac-num','frac-den'].forEach(id=>{const f=document.getElementById(id);f.addEventListener('keydown',e=>{if(e.key==='Enter')confirmFraction();if(e.key==='Escape')cancelInput()});f.addEventListener('input',updateFP)});
-loadState()
+
+loadState();
+showTitle();
 }
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
-function showTitle(){showScreen('title-screen');hideOverlays();const s=localStorage.getItem('vquest_state');document.getElementById('btn-continue').style.display=s?'inline-flex':'none'}
-function showHow(){showScreen('how-screen')}
-function showGame(){showScreen('game-screen');resizeCanvas();draw()}
+function showTitle(){showScreen('title-screen');hideOverlays();stopPulse();const s=localStorage.getItem('vquest_state');document.getElementById('btn-continue').style.display=s?'inline-flex':'none'}
+function showHow(){showScreen('how-screen');stopPulse()}
+function showGame(){
+showScreen('game-screen');
+// Use rAF to ensure the game screen is laid out before measuring canvas
+requestAnimationFrame(()=>{
+resizeCanvas();
+draw();
+startPulse();
+});
+}
 function hideOverlays(){document.getElementById('level-complete').style.display='none';document.getElementById('level-failed').style.display='none'}
+
+// Pulse loop for target animations (replaces the rAF inside drawTgt)
+function startPulse(){stopPulse();function loop(){if(!document.getElementById('game-screen').classList.contains('active')){pulseRAF=null;return}if(!an.active)draw();pulseRAF=requestAnimationFrame(loop)}pulseRAF=requestAnimationFrame(loop)}
+function stopPulse(){if(pulseRAF){cancelAnimationFrame(pulseRAF);pulseRAF=null}}
 
 function startNew(){st.level=1;st.score=0;st.levelHistory=[];st.combo=0;saveState();setupLevel();showGame()}
 function continueGame(){loadState();setupLevel();showGame()}
@@ -371,7 +409,8 @@ const coords=[Math.abs(st.target.x),Math.abs(st.target.y),Math.abs(st.slopeTarge
 const mx=Math.max(...coords,6)+2,b=Math.min(Math.max(mx,7),14);
 bounds={xMin:-b,xMax:b,yMin:-b,yMax:b};
 document.getElementById('mission-text').textContent=buildMission(st.target,st.slopeTarget);
-updateUI();hideOverlays();hideFB();draw()
+document.getElementById('btn-try').disabled=false;
+updateUI();hideOverlays();hideFB()
 }
 
 function updateUI(){
@@ -423,9 +462,10 @@ const sOK=Math.abs(eY-st.slopeTarget.y)<.001;
 startAnim(vOK&&sOK)
 }
 
-/* Animation */
+/* ===== Animation ===== */
 function startAnim(ok){
 an.active=true;an.phase='fly';an.startTime=performance.now();an.isCorrect=ok;
+stopPulse(); // stop idle pulse loop during animation
 const[ex,ey]=toPixel(st.h,st.k);an.startPx=[cW/2,-40];an.endPx=[ex,ey];
 an.saucerX=an.startPx[0];an.saucerY=an.startPx[1];an.laserProgress=0;an.glowAlpha=0;an.hitP=[];an.hitR=[];
 document.getElementById('btn-try').disabled=true;requestAnimationFrame(animLoop)
@@ -438,7 +478,7 @@ case'fly':{const t=Math.min(el/FLY,1),e=1-Math.pow(1-t,3);an.saucerX=an.startPx[
 case'glow':{const t=Math.min(el/GLOW,1);an.glowAlpha=t<.4?t/.4:1;if(t>=1){an.phase='laser';an.startTime=ts}break}
 case'laser':{const t=Math.min(el/LASER,1);an.laserProgress=1-Math.pow(1-t,2);if(t>=1){an.laserProgress=1;if(an.isCorrect){an.phase='hit';an.startTime=ts;mkHit();document.getElementById('canvas-wrapper').classList.add('shake');setTimeout(()=>document.getElementById('canvas-wrapper').classList.remove('shake'),500)}else{an.phase='hold';an.startTime=ts}}break}
 case'hit':{const t=Math.min(el/HIT,1);updHit(t);if(t>=1){an.phase='hold';an.startTime=ts}break}
-case'hold':{const t=Math.min(el/HOLD,1);if(t>=1){an.phase='done';an.active=false;document.getElementById('btn-try').disabled=false;onDone();return}break}
+case'hold':{const t=Math.min(el/HOLD,1);if(t>=1){an.phase='done';an.active=false;document.getElementById('btn-try').disabled=false;startPulse();onDone();return}break}
 }
 drawAF();requestAnimationFrame(animLoop)
 }
@@ -473,14 +513,14 @@ st.score+=pts;st.levelHistory.push(stars);saveState();updateUI();showPtPop('+'+p
 showFB('🎯 Direct hit! Mission complete!','success');setTimeout(()=>showLC(stars,pts),1200)
 }else{
 st.combo=0;
-if(st.attempts>0){showFB('✕ '+genHint(),'fail');setTimeout(()=>draw(),200)}
+if(st.attempts>0){showFB('✕ '+genHint(),'fail')}
 else{showFB('✕ Out of tries!','fail');setTimeout(()=>showLF(),1000)}
 updateUI()
 }}
 
 function showPtPop(txt){const p=document.createElement('div');p.className='point-popup';p.textContent=txt;p.style.left='50%';p.style.top='40%';p.style.transform='translateX(-50%)';document.getElementById('canvas-wrapper').appendChild(p);setTimeout(()=>p.remove(),1300)}
 
-/* Drawing */
+/* ===== Drawing ===== */
 function drawSaucer(sx,sy,ph){ctx.save();ctx.translate(sx,sy);if(ph!=='fly')ctx.translate(0,Math.sin(performance.now()*.005)*2.5);
 ctx.beginPath();ctx.ellipse(0,0,24,9,0,0,Math.PI*2);const bg=ctx.createLinearGradient(-24,-9,24,9);bg.addColorStop(0,'#5a6577');bg.addColorStop(.3,'#d1d5db');bg.addColorStop(.5,'#f3f4f6');bg.addColorStop(.7,'#d1d5db');bg.addColorStop(1,'#5a6577');ctx.fillStyle=bg;ctx.fill();ctx.strokeStyle='rgba(200,220,255,.3)';ctx.lineWidth=1;ctx.stroke();
 ctx.beginPath();ctx.ellipse(0,-4,12,12,0,Math.PI,0);const dg=ctx.createRadialGradient(0,-10,2,0,-7,13);dg.addColorStop(0,'rgba(96,165,250,.95)');dg.addColorStop(.5,'rgba(96,165,250,.4)');dg.addColorStop(1,'rgba(96,165,250,.05)');ctx.fillStyle=dg;ctx.fill();ctx.strokeStyle='rgba(96,165,250,.4)';ctx.lineWidth=.8;ctx.stroke();
@@ -525,29 +565,36 @@ document.getElementById('fail-answer').textContent='Answer: a = '+ff(c.aN,c.aD,c
 document.getElementById('fail-story').textContent=STORY_F[(st.level-1)%STORY_F.length]}
 
 function nextLevel(){st.level++;saveState();setupLevel();showGame()}
-function retryLevel(){st.combo=0;setupLevel();hideOverlays()}
+function retryLevel(){st.combo=0;setupLevel();hideOverlays();showGame()}
 function saveState(){try{localStorage.setItem('vquest_state',JSON.stringify({level:st.level,score:st.score,levelHistory:st.levelHistory,combo:st.combo}))}catch(e){}}
 function loadState(){try{const r=localStorage.getItem('vquest_state');if(r){const s=JSON.parse(r);st.level=s.level||1;st.score=s.score||0;st.levelHistory=s.levelHistory||[];st.combo=s.combo||0}}catch(e){}}
 
-/* Canvas */
-function resizeCanvas(){const w=document.getElementById('canvas-wrapper'),d=devicePixelRatio||1;cW=w.clientWidth;cH=w.clientHeight;canvas.width=cW*d;canvas.height=cH*d;canvas.style.width=cW+'px';canvas.style.height=cH+'px';ctx.setTransform(d,0,0,d,0,0);uPx=Math.min(cW/(bounds.xMax-bounds.xMin),cH/(bounds.yMax-bounds.yMin))}
+/* ===== Canvas ===== */
+function resizeCanvas(){
+const w=document.getElementById('canvas-wrapper');
+if(!w)return;
+const d=devicePixelRatio||1;
+cW=w.clientWidth;cH=w.clientHeight;
+if(cW===0||cH===0)return; // not laid out yet
+canvas.width=cW*d;canvas.height=cH*d;
+canvas.style.width=cW+'px';canvas.style.height=cH+'px';
+ctx.setTransform(d,0,0,d,0,0);
+uPx=Math.min(cW/(bounds.xMax-bounds.xMin),cH/(bounds.yMax-bounds.yMin))
+}
 function toPixel(mx,my){return[cW/2+mx*uPx,cH/2-my*uPx]}
 
-function draw(){if(!ctx)return;ctx.clearRect(0,0,cW,cH);drawBG();drawGrid();drawAxes();drawTgt();drawSTgt()}
+function draw(){if(!ctx||cW===0||cH===0)return;ctx.clearRect(0,0,cW,cH);drawBG();drawGrid();drawAxes();drawTgt();drawSTgt()}
 
 function drawBG(){
-/* Subtle space watermark behind grid */
 const cx=cW/2,cy=cH/2;
 const g=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(cW,cH)*.6);
 g.addColorStop(0,'rgba(20,30,60,.15)');g.addColorStop(.5,'rgba(15,20,40,.08)');g.addColorStop(1,'rgba(10,15,25,0)');
 ctx.fillStyle=g;ctx.fillRect(0,0,cW,cH);
-/* Subtle planet watermark */
 const t=Date.now()*.00003;
 const px=cW*.75+Math.sin(t)*20,py=cH*.25+Math.cos(t*.7)*15;
 const pg=ctx.createRadialGradient(px,py,5,px,py,60);
 pg.addColorStop(0,'rgba(96,165,250,.06)');pg.addColorStop(.5,'rgba(96,165,250,.03)');pg.addColorStop(1,'transparent');
 ctx.fillStyle=pg;ctx.fillRect(0,0,cW,cH);
-/* Ring around planet */
 ctx.save();ctx.translate(px,py);ctx.scale(1,.3);ctx.beginPath();ctx.arc(0,0,55,0,Math.PI*2);ctx.strokeStyle='rgba(96,165,250,.04)';ctx.lineWidth=8;ctx.stroke();ctx.restore()
 }
 
@@ -569,8 +616,7 @@ function drawTgt(){const[tx,ty]=toPixel(st.target.x,st.target.y);
 ctx.beginPath();ctx.arc(tx,ty,14,0,Math.PI*2);ctx.fillStyle=C.tgtG;ctx.fill();
 const p=1+.15*Math.sin(Date.now()/300);ctx.beginPath();ctx.arc(tx,ty,10*p,0,Math.PI*2);ctx.strokeStyle=C.tgt;ctx.lineWidth=2;ctx.stroke();
 ctx.beginPath();ctx.arc(tx,ty,4,0,Math.PI*2);ctx.fillStyle=C.tgt;ctx.fill();
-ctx.fillStyle=C.tgt;ctx.font='600 12px "Outfit",sans-serif';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('('+st.target.x+', '+st.target.y+')',tx+14,ty-6);
-if(!an.active)requestAnimationFrame(draw)}
+ctx.fillStyle=C.tgt;ctx.font='600 12px "Outfit",sans-serif';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('('+st.target.x+', '+st.target.y+')',tx+14,ty-6)}
 
 function drawSTgt(){const[tx,ty]=toPixel(st.slopeTarget.x,st.slopeTarget.y);
 ctx.beginPath();ctx.arc(tx,ty,12,0,Math.PI*2);ctx.fillStyle=C.sTG;ctx.fill();
@@ -579,7 +625,9 @@ ctx.beginPath();ctx.moveTo(tx,ty-sz);ctx.lineTo(tx+sz,ty);ctx.lineTo(tx,ty+sz);c
 ctx.beginPath();ctx.arc(tx,ty,3,0,Math.PI*2);ctx.fillStyle=C.sT;ctx.fill();
 ctx.fillStyle=C.sT;ctx.font='600 12px "Outfit",sans-serif';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('('+st.slopeTarget.x+', '+st.slopeTarget.y+')',tx+14,ty-6)}
 
-document.addEventListener('DOMContentLoaded',()=>{init();showTitle()});
+// Initialize immediately — script is at bottom of body, DOM is ready
+init();
+
 return{startNew,continueGame,showTitle,showHow,trySolution,confirmInput,cancelInput,confirmFraction,toggleFracSign,nextLevel,retryLevel}
 })();
 </script>
